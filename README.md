@@ -1,2 +1,4 @@
 # Javascript Advanced Project - Start2Impact University
-App to obtain cities' life quality score, built with HTML, CSS, JS and Axios.js, Chart.js and Webpack.
+Hi! 👋
+
+I'm glad to present you **LifeScanner**: an app to obtain the life quality score of the cities all around the world. 
