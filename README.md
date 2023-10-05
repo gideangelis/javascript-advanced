@@ -46,7 +46,7 @@ Also, this is the first time I work with a bundle such as Webpack, and I've unde
 
 ## Author
 
-- Giorgia De Angelis - [LinkedIn](https://www.your-site.com](https://www.linkedin.com/in/giorgia-de-angelis-webdev/)
+- Giorgia De Angelis - [LinkedIn](https://www.linkedin.com/in/giorgia-de-angelis-webdev/)
 
 ## Acknowledgments
 
