@@ -2,16 +2,22 @@ import {
   fetchCityData,
   fetchCityApiData,
   fetchUrbanAreaScores,
-  createScoresChart
+  createScoresChart,
 } from "./api.js";
+
+import get from "lodash.get";
+
 
 // DOM
 const searchInput = document.getElementById("search-input");
 const searchBtn = document.getElementById("search-btn");
 
+
 // If the input is valid, get the data
 export async function activateSearch() {
-  const cityName = searchInput.value.trim();
+
+  // Get the cityName inserted by the user
+  const cityName = get(searchInput, "value").trim();
 
   // Check if the city name is empty
   if (cityName.length === 0) {
@@ -19,43 +25,52 @@ export async function activateSearch() {
     return;
   }
 
-  // Try to retrieve city data
+  // Try to retrieve city data and catch possible errors 
   try {
     getData(cityName);
     searchInput.value = "";
   } catch (err) {
-    console.error(err);
     alert("An error occured. Please try again.");
   }
 }
 
+
+// Get and display data from Teleport API
 async function getData(cityName) {
+
   try {
     const cityData = await fetchCityData(cityName);
     const cityApiData = await fetchCityApiData(cityData);
     const urbanAreaScores = await fetchUrbanAreaScores(cityApiData);
 
     displayResults(cityApiData, urbanAreaScores);
+
   } catch (err) {
-    console.error(err);
-    alert("Please, enter a valid city name.");
+    alert('Please, enter a valid city name.');
+    console.error('Invalid city name.');
   }
+
 }
 
+
+// Display data in the result container when fetched
 function displayResults(cityApiData, urbanAreaScores) {
+
   const result = document.getElementById("result");
 
-  if (cityApiData.count === 0) {
-    alert("Invaid city name. Please, try another one.");
+  // If no cities with the name inserted by the users are found, throw an error
+  if (get(cityApiData, "count") === 0) {
+    alert("City not found. Please, try another city name.");
   } else {
+    // Display the result section
     result.style.display = "flex";
+
+    // Insert all data into the result section
     result.innerHTML = `
       <div class="result-city-section">
         <div class="city-sum">
-          <h2 class="city-name">${cityApiData.full_name}</h2>
-          <h3 class="city-score">Overall score: ${urbanAreaScores.teleport_city_score.toFixed(
-            1
-          )}/100</h3>
+          <h2 class="city-name">${get(cityApiData, "full_name")}</h2>
+          <h3 class="city-score">Overall score: ${get(urbanAreaScores,"teleport_city_score",0).toFixed(1)}/100</h3>
           <p class="city-description">${urbanAreaScores.summary}</p>
         </div>
         <img class="city-img" id="city-img" src="assets/img/ecocity.png">
@@ -84,17 +99,23 @@ function displayResults(cityApiData, urbanAreaScores) {
         </div>
     `;
 
+    // Display quality life scores of any city in a chart 
     createScoresChart(urbanAreaScores);
 
     const cityScore = document.querySelector(".city-score");
 
+    // If the overall life quality score is less than 50, display a certain color (less green)
     if (urbanAreaScores.teleport_city_score < 50) {
       cityScore.style.color = "#dbfc03";
+
+      // If overall life quality score is more than 65, display another color (greener)
     } else if (urbanAreaScores.teleport_city_score > 65) {
       cityScore.style.color = "#00ba3e";
     }
 
+    // Once the result is loaded, scroll slowly the screen into this section
     result.scrollIntoView({ behavior: "smooth" });
+
   }
 }
 
